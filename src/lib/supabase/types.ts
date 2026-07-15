@@ -45,6 +45,7 @@ export interface Database {
           languages: LocaleCode[]
           service_radius_km: number
           availability: Json
+          pay_details: string | null
           verification_status: VerificationStatus
           verification_notes: string | null
           rating_avg: number

@@ -35,10 +35,10 @@ export default function Home() {
         <nav className="hidden items-center gap-8 text-[15px] font-semibold text-[#47645f] md:flex">
           <a href="#how" className="hover:text-[#187864]">How it works</a><a href="#community" className="hover:text-[#187864]">Our community</a><a href="#safety" className="hover:text-[#187864]">Safety</a>
         </nav>
-        <Link href="/signup-requester" className="hidden rounded-xl bg-[#187864] px-5 py-3 text-sm font-bold text-white shadow-[0_5px_12px_rgba(24,120,100,.2)] transition hover:bg-[#126653] md:block">Request help</Link>
+        <div className="hidden items-center gap-4 md:flex"><Link href="/login" className="text-sm font-bold text-[#47716a] hover:text-[#187864]">Sign in</Link><Link href="/signup-requester" className="rounded-xl bg-[#187864] px-5 py-3 text-sm font-bold text-white shadow-[0_5px_12px_rgba(24,120,100,.2)] transition hover:bg-[#126653]">Request help</Link></div>
         <button className="grid h-11 w-11 place-items-center rounded-xl bg-[#eff7f4] md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open navigation">{menuOpen ? <X/> : <Menu/>}</button>
       </header>
-      {menuOpen && <div className="mx-5 rounded-2xl border border-[#dbe9e4] bg-white p-4 shadow-lg md:hidden"><div className="grid gap-2 text-center font-semibold"><a href="#how">How it works</a><a href="#safety">Safety</a><Link href="/signup-requester" className="mt-2 rounded-xl bg-[#187864] p-3 text-white">Request help</Link></div></div>}
+      {menuOpen && <div className="mx-5 rounded-2xl border border-[#dbe9e4] bg-white p-4 shadow-lg md:hidden"><div className="grid gap-2 text-center font-semibold"><a href="#how">How it works</a><a href="#safety">Safety</a><Link href="/login" className="p-3 text-[#187864]">Sign in</Link><Link href="/signup-requester" className="rounded-xl bg-[#187864] p-3 text-white">Request help</Link></div></div>}
 
       <section id="top" className="relative mx-auto max-w-[1240px] px-5 pb-16 pt-12 lg:px-8 lg:pb-24 lg:pt-20" aria-labelledby="hero-title">
         <div className="absolute left-[-10%] top-20 -z-10 h-72 w-72 rounded-full bg-[#dcefe8] blur-3xl opacity-65"/>
