@@ -41,13 +41,19 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [savedName, setSavedName] = useState('')
+  const [checkingProfile, setCheckingProfile] = useState(true)
 
   useEffect(() => {
     const requester = getLocalRequester()
     const helper = getLocalHelpers()[0]
-    setSavedName(requester?.name ?? helper?.name ?? '')
+    if (requester || helper) {
+      window.location.replace('/helpers')
+      return
+    }
+    setCheckingProfile(false)
   }, [])
+
+  if (checkingProfile) return <main className="grid min-h-screen place-items-center bg-[#f4f9f7] px-5 text-center text-[#183d38]"><div><span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#187864] text-white"><Heart size={28} fill="currentColor" /></span><p className="mt-5 text-lg font-extrabold">Opening your Neighbourly space…</p></div></main>
 
   return <main className="min-h-screen overflow-hidden bg-[#fcfdfc] text-[#183d38]">
     <a href="#main" className="skip-link">Skip to content</a>
@@ -66,7 +72,7 @@ export default function Home() {
       <div className="absolute right-[-8%] top-24 -z-10 h-60 w-60 rounded-full bg-[#fff0e6] blur-3xl opacity-70"/>
       <div className="grid items-center gap-12 lg:grid-cols-[1.06fr_.94fr]">
         <div className="max-w-[680px]">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#e7f5ef] px-4 py-2 text-sm font-bold text-[#187864]"><span className="h-2 w-2 rounded-full bg-[#48af7c]"/>{savedName ? `Welcome back, ${savedName.split(' ')[0]}` : 'Built for everyday life in Luxembourg'}</div>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#e7f5ef] px-4 py-2 text-sm font-bold text-[#187864]"><span className="h-2 w-2 rounded-full bg-[#48af7c]"/>Built for everyday life in Luxembourg</div>
           <h1 id="hero-title" className="max-w-[690px] text-[46px] font-extrabold leading-[1.06] tracking-[-.055em] text-[#173f39] sm:text-[66px]">Get trusted everyday help from <span className="text-[#e87d4e]">local neighbours.</span></h1>
           <p className="mt-6 max-w-[610px] text-[19px] leading-8 text-[#5b7771]">From groceries and pharmacy pickups to tech help, rides and companionship — describe what you need and find the right local helper in minutes.</p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row"><Link href="/signup-requester" className="group flex min-h-14 items-center justify-center gap-3 rounded-xl bg-[#187864] px-6 text-[17px] font-bold text-white shadow-[0_8px_16px_rgba(24,120,100,.22)] transition hover:-translate-y-0.5 hover:bg-[#126653]">I need help <ArrowRight className="transition group-hover:translate-x-1" size={20}/></Link><Link href="/signup-helper" className="flex min-h-14 items-center justify-center gap-3 rounded-xl border-2 border-[#c9ddd7] bg-white px-6 text-[17px] font-bold text-[#28554d] transition hover:border-[#187864]">I want to help <HandHeart size={20} className="text-[#e87d4e]"/></Link></div>
