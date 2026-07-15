@@ -21,19 +21,11 @@ Volunteers can browse requests, offer assistance, and communicate with seniors t
 
 The goal is to reduce loneliness, support independent living, and strengthen neighbourhood communities across Luxembourg.
 
-## Accounts and persistent data
+## Saved community details
 
-Neighbourly has separate secure accounts for helpers and help finders. Accounts are stored in Supabase Auth and their profiles are stored in the Supabase PostgreSQL database, so they remain available after a browser or server restart.
+Neighbourly intentionally has no login or password step. Helper and help-finder details are saved in the browser using local storage, so they are still there when the user closes and reopens the website on the same device. This keeps the experience simple for older adults and avoids asking them to remember credentials.
 
-### Production setup
-
-1. Create a Supabase project.
-2. In its SQL Editor, run the migrations in `supabase/migrations/0001_init.sql` and then `supabase/migrations/0002_auth_accounts.sql`.
-3. In Supabase Authentication → URL Configuration, set the Site URL to your Vercel domain and add these redirect URLs:
-   - `https://your-domain.vercel.app/login-helper`
-   - `https://your-domain.vercel.app/login-help-finder`
-4. In Vercel → Project → Settings → Environment Variables, add the two values in `.env.example` from Supabase → Project Settings → API.
-5. Redeploy. New accounts will then persist securely. Helpers start as `pending` and must be marked `verified` before appearing in the public directory.
+For a future multi-device marketplace, replace `src/lib/community-local.ts` with a server-side store and add consent, verification, and access controls before sharing personal contact details across users.
 
 # How we built it
 

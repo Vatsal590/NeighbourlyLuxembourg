@@ -3,14 +3,8 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, Clock3, Heart, MapPin, Phone, Search, ShieldCheck, Wallet } from 'lucide-react'
-type Helper = {
-  id: string
-  name: string
-  phoneNumber: string
-  timeAvailableForWork: string
-  pay: string
-  address: string
-}
+import { getLocalHelpers, type LocalHelper } from '@/lib/community-local'
+type Helper = LocalHelper
 
 const messages: Record<string, string> = {
   'helper-joined': 'Thanks for offering to help! You’re now visible to people nearby.',
@@ -26,11 +20,7 @@ export default function HelpersPage() {
 
   useEffect(() => {
     setMessage(messages[new URLSearchParams(window.location.search).get('message') ?? ''] ?? '')
-    fetch('/api/helpers').then(async (response) => {
-      const data = await response.json() as { helpers?: Helper[]; error?: string }
-      if (!response.ok) throw new Error(data.error ?? 'We could not load helpers right now.')
-      setHelpers(data.helpers ?? [])
-    }).catch((error) => { setHelpers([]); setLoadError(error instanceof Error ? error.message : 'We could not load helpers right now.') }).finally(() => setLoading(false))
+    try { setHelpers(getLocalHelpers()) } catch { setLoadError('We could not load saved helpers on this device.') } finally { setLoading(false) }
   }, [])
   const filtered = useMemo(() => helpers.filter((helper) => `${helper.address} ${helper.timeAvailableForWork} ${helper.name}`.toLowerCase().includes(query.toLowerCase())), [helpers, query])
 

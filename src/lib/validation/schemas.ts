@@ -2,32 +2,9 @@ import { z } from 'zod'
 import { CATEGORIES, LANGUAGES, ROLES, URGENCY_LEVELS } from '@/lib/constants'
 
 export const emailSchema = z.string().email().max(254)
-export const passwordSchema = z
-  .string()
-  .min(8, 'Use at least 8 characters')
-  .max(128)
-  .regex(/[A-Z]/, 'Add at least one uppercase letter')
-  .regex(/[a-z]/, 'Add at least one lowercase letter')
-  .regex(/[0-9]/, 'Add at least one number')
-
 export const localeSchema = z.enum(LANGUAGES.map((l) => l.code) as [string, ...string[]])
 
 export const roleSchema = z.enum(ROLES)
-
-export const signUpSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  fullName: z.string().min(2).max(80),
-  role: roleSchema,
-  locale: localeSchema.default('en'),
-  phone: z.string().regex(/^\+?[0-9 \-()]{6,20}$/).optional(),
-  acceptedTerms: z.literal(true, { errorMap: () => ({ message: 'Please accept the terms' }) })
-})
-
-export const loginSchema = z.object({
-  email: emailSchema,
-  password: z.string().min(1)
-})
 
 export const profileSchema = z.object({
   full_name: z.string().min(2).max(80),
@@ -125,8 +102,6 @@ export const urgencyInputSchema = z.object({
   locale: localeSchema.default('en')
 })
 
-export type SignUpInput = z.infer<typeof signUpSchema>
-export type LoginInput = z.infer<typeof loginSchema>
 export type RequestInput = z.infer<typeof requestSchema>
 export type MessageInput = z.infer<typeof messageSchema>
 export type VolunteerProfileInput = z.infer<typeof volunteerProfileSchema>

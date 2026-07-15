@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowRight, Check, Clock3, Heart, Menu, MessageCircle, ShieldCheck, Star, UsersRound, X
 } from 'lucide-react'
+import { getLocalHelpers, getLocalRequester } from '@/lib/community-local'
 
 const categories = [
   { icon: '🛒', title: 'Shopping & errands', note: 'Groceries, pharmacy & more', color: 'bg-orange-50' },
@@ -23,6 +24,13 @@ const volunteers = [
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [savedName, setSavedName] = useState('')
+
+  useEffect(() => {
+    const requester = getLocalRequester()
+    const helper = getLocalHelpers()[0]
+    setSavedName(requester?.name ?? helper?.name ?? '')
+  }, [])
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#fcfdfc] text-[#183d38]">
@@ -35,16 +43,16 @@ export default function Home() {
         <nav className="hidden items-center gap-8 text-[15px] font-semibold text-[#47645f] md:flex">
           <a href="#how" className="hover:text-[#187864]">How it works</a><a href="#community" className="hover:text-[#187864]">Our community</a><a href="#safety" className="hover:text-[#187864]">Safety</a>
         </nav>
-        <div className="hidden items-center gap-4 md:flex"><Link href="/login" className="text-sm font-bold text-[#47716a] hover:text-[#187864]">Sign in</Link><Link href="/signup-requester" className="rounded-xl bg-[#187864] px-5 py-3 text-sm font-bold text-white shadow-[0_5px_12px_rgba(24,120,100,.2)] transition hover:bg-[#126653]">Request help</Link></div>
+        <Link href="/signup-requester" className="hidden rounded-xl bg-[#187864] px-5 py-3 text-sm font-bold text-white shadow-[0_5px_12px_rgba(24,120,100,.2)] transition hover:bg-[#126653] md:block">Request help</Link>
         <button className="grid h-11 w-11 place-items-center rounded-xl bg-[#eff7f4] md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open navigation">{menuOpen ? <X/> : <Menu/>}</button>
       </header>
-      {menuOpen && <div className="mx-5 rounded-2xl border border-[#dbe9e4] bg-white p-4 shadow-lg md:hidden"><div className="grid gap-2 text-center font-semibold"><a href="#how">How it works</a><a href="#safety">Safety</a><Link href="/login" className="p-3 text-[#187864]">Sign in</Link><Link href="/signup-requester" className="rounded-xl bg-[#187864] p-3 text-white">Request help</Link></div></div>}
+      {menuOpen && <div className="mx-5 rounded-2xl border border-[#dbe9e4] bg-white p-4 shadow-lg md:hidden"><div className="grid gap-2 text-center font-semibold"><a href="#how">How it works</a><a href="#safety">Safety</a><Link href="/signup-requester" className="rounded-xl bg-[#187864] p-3 text-white">Request help</Link></div></div>}
 
       <section id="top" className="relative mx-auto max-w-[1240px] px-5 pb-16 pt-12 lg:px-8 lg:pb-24 lg:pt-20" aria-labelledby="hero-title">
         <div className="absolute left-[-10%] top-20 -z-10 h-72 w-72 rounded-full bg-[#dcefe8] blur-3xl opacity-65"/>
         <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
           <div className="max-w-[640px]">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#e7f5ef] px-4 py-2 text-sm font-bold text-[#187864]"><span className="h-2 w-2 rounded-full bg-[#48af7c]"/> Kind help, close to home</div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#e7f5ef] px-4 py-2 text-sm font-bold text-[#187864]"><span className="h-2 w-2 rounded-full bg-[#48af7c]"/> {savedName ? `Welcome back, ${savedName.split(' ')[0]}` : 'Kind help, close to home'}</div>
             <h1 id="hero-title" className="max-w-[680px] text-[47px] font-extrabold leading-[1.08] tracking-[-.055em] text-[#173f39] sm:text-[64px]">A helping hand is <span className="text-[#e87d4e]">just around</span> the corner.</h1>
             <p className="mt-6 max-w-[570px] text-[19px] leading-8 text-[#5b7771]">Neighbourly connects you with trusted people nearby for everyday help — simply, safely, and on your terms.</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row"><Link href="/signup-requester" className="group flex min-h-14 items-center justify-center gap-3 rounded-xl bg-[#187864] px-6 text-[17px] font-bold text-white shadow-[0_8px_16px_rgba(24,120,100,.22)] transition hover:-translate-y-0.5 hover:bg-[#126653]">I need some help <ArrowRight className="transition group-hover:translate-x-1" size={20}/></Link><Link href="/signup-helper" className="flex min-h-14 items-center justify-center gap-3 rounded-xl border-2 border-[#c9ddd7] bg-white px-6 text-[17px] font-bold text-[#28554d] transition hover:border-[#187864]">I want to help <Heart size={19} fill="currentColor" className="text-[#e87d4e]"/></Link></div>
