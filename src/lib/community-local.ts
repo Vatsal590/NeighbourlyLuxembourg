@@ -55,21 +55,37 @@ const read = <T,>(key: string, fallback: T): T => {
   try { return JSON.parse(window.localStorage.getItem(key) ?? JSON.stringify(fallback)) as T } catch { return fallback }
 }
 
-export const getLocalHelpers = () => read<LocalHelper[]>(HELPERS_KEY, demoHelpers)
+const isTestProfile = (name: string) => ['h', 'john ag', 'abc'].includes(name.trim().toLowerCase())
+
+export const getLocalHelpers = () => {
+  const helpers = read<LocalHelper[]>(HELPERS_KEY, demoHelpers)
+  const cleaned = helpers.filter((helper) => !isTestProfile(helper.name))
+  if (typeof window !== 'undefined' && cleaned.length !== helpers.length) window.localStorage.setItem(HELPERS_KEY, JSON.stringify(cleaned))
+  return cleaned
+}
 
 type StoredRequester = Omit<LocalRequester, 'id'> & { id?: string }
 
 export const getLocalRequesters = () => {
   const stored = read<StoredRequester | StoredRequester[] | null>(REQUESTER_KEY, null)
   const records = Array.isArray(stored) ? stored : stored ? [stored] : []
-  return records.map((requester, index): LocalRequester => ({
+  const requesters = records.map((requester, index): LocalRequester => ({
     ...requester,
     id: requester.id ?? `${requester.savedAt ?? 'saved'}-${requester.name}-${index}`
   }))
+  const cleaned = requesters.filter((requester) => !isTestProfile(requester.name))
+  if (typeof window !== 'undefined' && cleaned.length !== requesters.length) window.localStorage.setItem(REQUESTER_KEY, JSON.stringify(cleaned))
+  return cleaned
 }
 
 export const getLocalRequester = () => getLocalRequesters()[0] ?? null
-export const getLocalActiveProfile = () => read<ActiveProfile | null>(ACTIVE_PROFILE_KEY, null)
+export const getLocalActiveProfile = () => {
+  const active = read<ActiveProfile | null>(ACTIVE_PROFILE_KEY, null)
+  if (!active || typeof window === 'undefined') return active
+  const exists = active.role === 'helper' ? getLocalHelpers().some((helper) => helper.id === active.id) : getLocalRequesters().some((requester) => requester.id === active.id)
+  if (!exists) { window.localStorage.removeItem(ACTIVE_PROFILE_KEY); return null }
+  return active
+}
 export const getLocalBookings = () => read<LocalBooking[]>(BOOKINGS_KEY, [])
 
 const setActiveProfile = (profile: ActiveProfile) => window.localStorage.setItem(ACTIVE_PROFILE_KEY, JSON.stringify(profile))
