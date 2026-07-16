@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { marketplaceTranslations } from '@/lib/marketplace-translations'
 
 export type Language = 'en' | 'fr' | 'de' | 'lb'
 
@@ -57,7 +58,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (saved && saved in languageNames) setLanguageState(saved)
   }, [])
   const setLanguage = (next: Language) => { setLanguageState(next); window.localStorage.setItem('neighbourly.language', next) }
-  const value = useMemo(() => ({ language, setLanguage, t: (key: string) => translations[language][key] ?? translations.en[key] ?? key }), [language])
+  const value = useMemo(() => ({ language, setLanguage, t: (key: string) => translations[language][key] ?? marketplaceTranslations[language][key] ?? translations.en[key] ?? marketplaceTranslations.en[key] ?? key }), [language])
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
 
