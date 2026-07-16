@@ -5,6 +5,10 @@ export type LocalHelper = {
   timeAvailableForWork: string
   pay: string
   address: string
+  services?: string[]
+  languages?: string[]
+  bio?: string
+  verificationStatus?: 'pending' | 'identity-checked'
   createdAt: string
 }
 
@@ -19,16 +23,39 @@ export type LocalRequester = {
 
 export type ActiveProfile = { role: 'helper' | 'requester'; id: string }
 
+export type LocalBooking = {
+  id: string
+  helperId: string
+  helperName: string
+  service: string
+  date: string
+  time: string
+  address: string
+  notes?: string
+  bookedFor: string
+  contactName: string
+  phoneNumber: string
+  createdAt: string
+  status: 'requested' | 'confirmed' | 'cancelled'
+}
+
 const HELPERS_KEY = 'neighbourly.helpers'
 const REQUESTER_KEY = 'neighbourly.requester'
 const ACTIVE_PROFILE_KEY = 'neighbourly.active-profile'
+const BOOKINGS_KEY = 'neighbourly.bookings'
+
+const demoHelpers: LocalHelper[] = [
+  { id: 'demo-marie', name: 'Marie Laurent', phoneNumber: '+352 621 123 456', timeAvailableForWork: 'Weekday mornings and Tuesday afternoons', pay: 'Volunteer or €20/hour', address: 'Luxembourg City, Gare', services: ['Groceries & pharmacy', 'Companionship visits'], languages: ['French', 'English', 'Luxembourgish'], bio: 'I enjoy helping neighbours with errands, a friendly walk and everyday support.', verificationStatus: 'identity-checked', createdAt: '2026-07-01T09:00:00.000Z' },
+  { id: 'demo-david', name: 'David Theis', phoneNumber: '+352 621 234 567', timeAvailableForWork: 'Weekday evenings and Saturdays', pay: '€22/hour', address: 'Luxembourg City, Kirchberg', services: ['Technology help', 'Rides & transport'], languages: ['German', 'English', 'French'], bio: 'I can help with phones, video calls and getting to local appointments.', verificationStatus: 'identity-checked', createdAt: '2026-07-02T09:00:00.000Z' },
+  { id: 'demo-sofia', name: 'Sofia Alves', phoneNumber: '+352 621 345 678', timeAvailableForWork: 'Monday to Friday, 10:00–16:00', pay: '€20/hour', address: 'Esch-sur-Alzette', services: ['Cleaning & home care', 'Small home tasks'], languages: ['French', 'Portuguese', 'English'], bio: 'I offer calm, practical help around the home and can explain each task clearly.', verificationStatus: 'identity-checked', createdAt: '2026-07-03T09:00:00.000Z' },
+]
 
 const read = <T,>(key: string, fallback: T): T => {
   if (typeof window === 'undefined') return fallback
   try { return JSON.parse(window.localStorage.getItem(key) ?? JSON.stringify(fallback)) as T } catch { return fallback }
 }
 
-export const getLocalHelpers = () => read<LocalHelper[]>(HELPERS_KEY, [])
+export const getLocalHelpers = () => read<LocalHelper[]>(HELPERS_KEY, demoHelpers)
 
 type StoredRequester = Omit<LocalRequester, 'id'> & { id?: string }
 
@@ -43,6 +70,7 @@ export const getLocalRequesters = () => {
 
 export const getLocalRequester = () => getLocalRequesters()[0] ?? null
 export const getLocalActiveProfile = () => read<ActiveProfile | null>(ACTIVE_PROFILE_KEY, null)
+export const getLocalBookings = () => read<LocalBooking[]>(BOOKINGS_KEY, [])
 
 const setActiveProfile = (profile: ActiveProfile) => window.localStorage.setItem(ACTIVE_PROFILE_KEY, JSON.stringify(profile))
 const clearActiveProfile = () => window.localStorage.removeItem(ACTIVE_PROFILE_KEY)
@@ -74,5 +102,19 @@ export function deleteLocalRequester(id: string) {
   if (!active || active.role !== 'requester' || active.id !== id) return false
   window.localStorage.setItem(REQUESTER_KEY, JSON.stringify(getLocalRequesters().filter((requester) => requester.id !== id)))
   clearActiveProfile()
+  return true
+}
+
+export function saveLocalBooking(booking: Omit<LocalBooking, 'id' | 'createdAt' | 'status'>) {
+  const record: LocalBooking = { ...booking, id: crypto.randomUUID(), createdAt: new Date().toISOString(), status: 'requested' }
+  window.localStorage.setItem(BOOKINGS_KEY, JSON.stringify([record, ...getLocalBookings()]))
+  return record
+}
+
+export function cancelLocalBooking(id: string) {
+  const bookings = getLocalBookings()
+  const exists = bookings.some((booking) => booking.id === id)
+  if (!exists) return false
+  window.localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings.map((booking) => booking.id === id ? { ...booking, status: 'cancelled' } : booking)))
   return true
 }
