@@ -9,6 +9,7 @@ export type LocalHelper = {
 }
 
 export type LocalRequester = {
+  id: string
   name: string
   phoneNumber: string
   address: string
@@ -25,7 +26,19 @@ const read = <T,>(key: string, fallback: T): T => {
 }
 
 export const getLocalHelpers = () => read<LocalHelper[]>(HELPERS_KEY, [])
-export const getLocalRequester = () => read<LocalRequester | null>(REQUESTER_KEY, null)
+
+type StoredRequester = Omit<LocalRequester, 'id'> & { id?: string }
+
+export const getLocalRequesters = () => {
+  const stored = read<StoredRequester | StoredRequester[] | null>(REQUESTER_KEY, null)
+  const records = Array.isArray(stored) ? stored : stored ? [stored] : []
+  return records.map((requester, index): LocalRequester => ({
+    ...requester,
+    id: requester.id ?? `${requester.savedAt ?? 'saved'}-${requester.name}-${index}`
+  }))
+}
+
+export const getLocalRequester = () => getLocalRequesters()[0] ?? null
 
 export function saveLocalHelper(helper: Omit<LocalHelper, 'id' | 'createdAt'>) {
   const record: LocalHelper = { ...helper, id: crypto.randomUUID(), createdAt: new Date().toISOString() }
@@ -33,8 +46,8 @@ export function saveLocalHelper(helper: Omit<LocalHelper, 'id' | 'createdAt'>) {
   return record
 }
 
-export function saveLocalRequester(requester: Omit<LocalRequester, 'savedAt'>) {
-  const record: LocalRequester = { ...requester, savedAt: new Date().toISOString() }
-  window.localStorage.setItem(REQUESTER_KEY, JSON.stringify(record))
+export function saveLocalRequester(requester: Omit<LocalRequester, 'id' | 'savedAt'>) {
+  const record: LocalRequester = { ...requester, id: crypto.randomUUID(), savedAt: new Date().toISOString() }
+  window.localStorage.setItem(REQUESTER_KEY, JSON.stringify([record, ...getLocalRequesters()]))
   return record
 }
