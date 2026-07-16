@@ -8,6 +8,8 @@ import {
   Sparkles, Star, X
 } from 'lucide-react'
 import { getLocalHelpers, getLocalRequester } from '@/lib/community-local'
+import { LanguageToggle } from '@/components/language-toggle'
+import { useLanguage } from '@/lib/language'
 
 const categories = [
   { icon: '🛒', title: 'Groceries & errands', note: 'Shopping, pharmacy and parcels', color: 'bg-orange-50' },
@@ -40,6 +42,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function Home() {
+  const { t } = useLanguage()
   const [menuOpen, setMenuOpen] = useState(false)
   const [checkingProfile, setCheckingProfile] = useState(true)
 
@@ -59,8 +62,9 @@ export default function Home() {
     <a href="#main" className="skip-link">Skip to content</a>
 
     <header className="mx-auto flex max-w-[1240px] items-center justify-between px-5 py-5 lg:px-8">
-      <a className="flex items-center gap-3" href="#top" aria-label="Neighbourly Luxembourg home"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#187864] text-white shadow-sm"><Heart size={23} fill="currentColor" /></span><span className="text-[22px] font-extrabold tracking-[-0.04em] text-[#17453d]">Neighbourly<span className="text-[#de7c4d]">.</span></span></a>
-      <nav className="hidden items-center gap-7 text-[15px] font-semibold text-[#47645f] md:flex"><a href="#how" className="hover:text-[#187864]">How it works</a><a href="#ai" className="hover:text-[#187864]">How AI helps</a><a href="#safety" className="hover:text-[#187864]">Safety</a><a href="#faq" className="hover:text-[#187864]">FAQ</a></nav>
+      <a className="flex items-center gap-3" href="#top" aria-label={`${t('brand')} home`}><span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#187864] text-white shadow-sm"><Heart size={23} fill="currentColor" /></span><span className="text-[22px] font-extrabold tracking-[-0.04em] text-[#17453d]">{t('brand')}</span></a>
+      <nav className="hidden items-center gap-7 text-[15px] font-semibold text-[#47645f] md:flex"><a href="#how" className="hover:text-[#187864]">{t('how')}</a><a href="#ai" className="hover:text-[#187864]">{t('ai')}</a><a href="#safety" className="hover:text-[#187864]">{t('safety')}</a><a href="#faq" className="hover:text-[#187864]">{t('faq')}</a></nav>
+      <LanguageToggle />
       <Link href="/signup-requester" className="hidden rounded-xl bg-[#187864] px-5 py-3 text-sm font-bold text-white shadow-[0_5px_12px_rgba(24,120,100,.2)] transition hover:bg-[#126653] md:block">I need help</Link>
       <button className="grid h-11 w-11 place-items-center rounded-xl bg-[#eff7f4] md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Open navigation">{menuOpen ? <X/> : <Menu/>}</button>
     </header>
@@ -72,9 +76,9 @@ export default function Home() {
       <div className="absolute right-[-8%] top-24 -z-10 h-60 w-60 rounded-full bg-[#fff0e6] blur-3xl opacity-70"/>
       <div className="grid items-center gap-12 lg:grid-cols-[1.06fr_.94fr]">
         <div className="max-w-[680px]">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#e7f5ef] px-4 py-2 text-sm font-bold text-[#187864]"><span className="h-2 w-2 rounded-full bg-[#48af7c]"/>Built for everyday life in Luxembourg</div>
-          <h1 id="hero-title" className="max-w-[690px] text-[46px] font-extrabold leading-[1.06] tracking-[-.055em] text-[#173f39] sm:text-[66px]">Get trusted everyday help from <span className="text-[#e87d4e]">local neighbours.</span></h1>
-          <p className="mt-6 max-w-[610px] text-[19px] leading-8 text-[#5b7771]">From groceries and pharmacy pickups to tech help, rides and companionship — describe what you need and find the right local helper in minutes.</p>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#e7f5ef] px-4 py-2 text-sm font-bold text-[#187864]"><span className="h-2 w-2 rounded-full bg-[#48af7c]"/>{t('builtFor')}</div>
+          <h1 id="hero-title" className="max-w-[690px] text-[46px] font-extrabold leading-[1.06] tracking-[-.055em] text-[#173f39] sm:text-[66px]">{t('homeHero')}</h1>
+          <p className="mt-6 max-w-[610px] text-[19px] leading-8 text-[#5b7771]">{t('homeSub')}</p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row"><Link href="/signup-requester" className="group flex min-h-14 items-center justify-center gap-3 rounded-xl bg-[#187864] px-6 text-[17px] font-bold text-white shadow-[0_8px_16px_rgba(24,120,100,.22)] transition hover:-translate-y-0.5 hover:bg-[#126653]">I need help <ArrowRight className="transition group-hover:translate-x-1" size={20}/></Link><Link href="/signup-helper" className="flex min-h-14 items-center justify-center gap-3 rounded-xl border-2 border-[#c9ddd7] bg-white px-6 text-[17px] font-bold text-[#28554d] transition hover:border-[#187864]">I want to help <HandHeart size={20} className="text-[#e87d4e]"/></Link></div>
           <p className="mt-4 text-sm font-medium text-[#6a817b]">No password needed for this demo — your details stay saved on this device.</p>
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-[#466b63]"><span className="flex items-center gap-2"><BadgeCheck size={18} className="text-[#187864]"/> Safety-first product design</span><span className="flex items-center gap-2"><LockKeyhole size={18} className="text-[#187864]"/> Privacy-minded by design</span><span className="flex items-center gap-2"><Languages size={18} className="text-[#187864]"/> EN · FR · DE · LB</span></div>
