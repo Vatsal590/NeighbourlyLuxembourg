@@ -33,28 +33,6 @@ do $$ begin
   end if;
 end $$;
 
--- ============== HELPERS ==============
-create or replace function public.is_admin(uid uuid)
-returns boolean language sql stable security definer set search_path = public as $$
-  select exists(select 1 from public.profiles where id = uid and role = 'admin');
-$$;
-
-create or replace function public.has_family_access(senior uuid, family uuid)
-returns boolean language sql stable security definer set search_path = public as $$
-  select exists(
-    select 1 from public.family_links
-    where senior_id = senior and family_id = family
-  );
-$$;
-
-create or replace function public.haversine_km(lat1 double precision, lng1 double precision, lat2 double precision, lng2 double precision)
-returns double precision language sql immutable as $$
-  select 6371 * 2 * asin(sqrt(
-    sin(radians((lat2 - lat1) / 2))^2 +
-    cos(radians(lat1)) * cos(radians(lat2)) * sin(radians((lng2 - lng1) / 2))^2
-  ));
-$$;
-
 -- ============== TABLES ==============
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -240,6 +218,28 @@ create table if not exists public.system_settings (
   value jsonb not null,
   updated_at timestamptz not null default now()
 );
+
+-- ============== HELPERS ==============
+create or replace function public.is_admin(uid uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists(select 1 from public.profiles where id = uid and role = 'admin');
+$$;
+
+create or replace function public.has_family_access(senior uuid, family uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists(
+    select 1 from public.family_links
+    where senior_id = senior and family_id = family
+  );
+$$;
+
+create or replace function public.haversine_km(lat1 double precision, lng1 double precision, lat2 double precision, lng2 double precision)
+returns double precision language sql immutable as $$
+  select 6371 * 2 * asin(sqrt(
+    sin(radians((lat2 - lat1) / 2))^2 +
+    cos(radians(lat1)) * cos(radians(lat2)) * sin(radians((lng2 - lng1) / 2))^2
+  ));
+$$;
 
 -- ============== TRIGGERS ==============
 create or replace function public.touch_updated_at()
